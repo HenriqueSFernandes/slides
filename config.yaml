@@ -1,4 +1,4 @@
 slides:
-  - file: t.md
-    title: Test
-    slug: test
+  - file: postgres.md
+    title: Postgres
+    slug: postgres
