@@ -1,0 +1,4 @@
+slides:
+  - file: t.md
+    title: Test
+    slug: test

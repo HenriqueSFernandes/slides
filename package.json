@@ -1,0 +1,22 @@
+{
+	"name": "slides",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "node build.js"
+	},
+	"keywords": [],
+	"author": "",
+	"type": "module",
+	"license": "ISC",
+	"devDependencies": {
+		"@marp-team/marp-cli": "^4.2.3"
+	},
+	"dependencies": {
+		"fs-extra": "^11.3.2",
+		"glob": "^11.0.3",
+		"js-yaml": "^4.1.0"
+	}
+}
