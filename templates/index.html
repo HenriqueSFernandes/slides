@@ -2,35 +2,37 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8" />
-	<title>Slides</title>
-	<style>
-		body {
-			font-family: sans-serif;
-			max-width: 600px;
-			margin: 2em auto;
-		}
 
-		a {
-			display: block;
-			margin: 0.5em 0;
-			color: #0078ff;
-			text-decoration: none;
-		}
+		<meta charset="UTF-8" />
 
-		a:hover {
-			text-decoration: underline;
-		}
-	</style>
-</head>
+		<title>Slides</title>
 
-<body>
-	<h1>Slides</h1>
-	<% slides.forEach(slide=> { %>
-		<a href="./<%= slide.slug %>/">
-			<%= slide.title %>
-		</a>
-		<% }); %>
-</body>
+		<link rel="stylesheet" href="styles.css">
+
+	</head>
+
+	<body>
+
+	<div class="container">
+
+		<h1>Slides</h1>
+
+		<ul class="slide-list">
+
+			<% slides.forEach(slide => { %>
+
+				<li class="slide-item">
+
+					<a class="slide-link" href="./<%= slide.slug %>/"><%= slide.title %></a>
+
+				</li>
+
+			<% }); %>
+
+		</ul>
+
+	</div>
+
+	</body>
 
 </html>
