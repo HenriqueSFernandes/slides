@@ -5,14 +5,17 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "node build.js"
+		"build": "npm run build:slides && npm run build:homepage",
+		"build:slides": "node build-slides.js",
+		"build:homepage": "node build-homepage.js"
 	},
 	"keywords": [],
 	"author": "",
 	"type": "module",
 	"license": "ISC",
 	"devDependencies": {
-		"@marp-team/marp-cli": "^4.2.3"
+		"@marp-team/marp-cli": "^4.2.3",
+		"ejs": "^3.1.10"
 	},
 	"dependencies": {
 		"fs-extra": "^11.3.2",
