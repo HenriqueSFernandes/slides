@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "npm run build && live-server dist",
 		"build": "npm run build:slides && npm run build:homepage",
 		"build:slides": "node build-slides.js",
 		"build:homepage": "node build-homepage.js"
@@ -15,7 +16,8 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@marp-team/marp-cli": "^4.2.3",
-		"ejs": "^3.1.10"
+		"ejs": "^3.1.10",
+		"live-server": "^1.2.2"
 	},
 	"dependencies": {
 		"fs-extra": "^11.3.2",

@@ -1,7 +1,10 @@
 slides:
-  - file: postgres-basics.md
+  - file: postgres-1.md
     title: Postgres Basics
-    slug: postgres-basics
-  - file: postgres-advanced.md
-    title: Postgres Advanced
-    slug: postgres-advanced
+    slug: postgres-1
+  - file: postgres-2.md
+    title: Postgres Advanced (Constraints, Views, Indexes, Triggers)
+    slug: postgres-2
+  - file: postgres-3.md
+    title: Postgres Transactions & Performance
+    slug: postgres-3
