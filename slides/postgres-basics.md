@@ -21,7 +21,7 @@ _class: lead
 6. Understanding `create.sql` and `populate.sql`
 7. Common SQL features and syntax
 8. Hands-on walkthrough
-9. Useful tools
+9. Useful tools (DataGrip, pgAdmin, etc.)
 10. Next steps
 
 ---
@@ -232,6 +232,23 @@ Some common types:
 - **pgAdmin** → web GUI
 - **DBeaver** → cross-platform desktop app
 - **Adminer** → lightweight web client (can run via Docker)
+- **DataGrip** → advanced IDE for SQL (see next slide 👇)
+
+---
+
+## 💻 DataGrip (Recommended)
+
+- Professional SQL IDE by **JetBrains**
+- Features:
+  - Smart autocomplete and code formatting
+  - Visual table browsing
+  - Easy Docker / remote DB connections
+  - Built-in data editing tools
+
+💡 **Students get it for free!**  
+Go to 👉 [https://www.jetbrains.com/academy/student-pack/](https://www.jetbrains.com/academy/student-pack/)
+
+Use your **FEUP email** (or GitHub Student Pack) to unlock DataGrip (and other JetBrains IDEs like IntelliJ, PyCharm, etc.).
 
 ---
 
@@ -259,7 +276,8 @@ docker rm -f lbaw-postgres
 
 - `create.sql` → define schema
 - `populate.sql` → seed data  
-  ✅ Run everything with **Docker + psql**
+  ✅ Run everything with **Docker + psql**  
+  ✅ Optional: use **DataGrip** for a better development experience
 
 ---
 
@@ -274,5 +292,3 @@ Next time we’ll explore:
 ---
 
 ## 💬 Questions?
-
----

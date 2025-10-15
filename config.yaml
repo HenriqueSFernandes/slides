@@ -1,4 +1,7 @@
 slides:
-  - file: postgres.md
-    title: Postgres
-    slug: postgres
+  - file: postgres-basics.md
+    title: Postgres Basics
+    slug: postgres-basics
+  - file: postgres-advanced.md
+    title: Postgres Advanced
+    slug: postgres-advanced
