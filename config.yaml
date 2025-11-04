@@ -8,3 +8,6 @@ slides:
   - file: postgres-3.md
     title: Postgres Transactions & Performance
     slug: postgres-3
+  - file: laravel-1.md
+    title: Laravel Introduction
+    slug: laravel-1

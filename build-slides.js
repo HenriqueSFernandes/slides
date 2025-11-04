@@ -10,7 +10,7 @@ for (const slide of config.slides) {
 	const outputDir = path.join("dist", slide.slug);
 	await fs.ensureDir(outputDir);
 	execSync(
-		`npx @marp-team/marp-cli ${inputPath} --html --allow-local-files --output ${outputDir}/index.html`,
+		`npx @marp-team/marp-cli ${inputPath} --html --allow-local-files --no-stdin --output ${outputDir}/index.html`,
 		{ stdio: "inherit" },
 	);
 	console.log(`Built ${slide.title}`);

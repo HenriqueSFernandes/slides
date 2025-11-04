@@ -8,7 +8,8 @@
 		"dev": "npm run build && live-server dist",
 		"build": "npm run build:slides && npm run build:homepage",
 		"build:slides": "node build-slides.js",
-		"build:homepage": "node build-homepage.js"
+		"build:homepage": "node build-homepage.js",
+		"watch": "nodemon --watch slides --watch templates --watch public -e js,md,html,css --exec npm run build"
 	},
 	"keywords": [],
 	"author": "",
@@ -16,8 +17,10 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@marp-team/marp-cli": "^4.2.3",
+		"chokidar": "^4.0.3",
 		"ejs": "^3.1.10",
-		"live-server": "^1.2.2"
+		"live-server": "^1.2.2",
+		"nodemon": "^3.1.10"
 	},
 	"dependencies": {
 		"fs-extra": "^11.3.2",
