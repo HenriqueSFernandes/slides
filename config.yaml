@@ -11,3 +11,6 @@ slides:
   - file: laravel-1.md
     title: Laravel Introduction
     slug: laravel-1
+  - file: tailwind.md
+    title: Tailwind CSS
+    slug: tailwind
