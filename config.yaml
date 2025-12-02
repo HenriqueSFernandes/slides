@@ -14,3 +14,6 @@ slides:
   - file: tailwind.md
     title: Tailwind CSS
     slug: tailwind
+  - file: acm-powerpoint-night.md
+    title: Stickers do Pinho
+    slug: acm-powerpoint-night
