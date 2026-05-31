@@ -20,3 +20,6 @@ slides:
   - file: grs-pitch.md
     title: GRS Pitch
     slug: grs-pitch
+  - file: grs-project.md
+    title: GRS Project Presentation
+    slug: grs-project
