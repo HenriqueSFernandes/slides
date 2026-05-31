@@ -54,6 +54,17 @@ _class: lead
 
 ---
 
+## Installation
+
+- Published on PyPI: [https://pypi.org/project/network-chaos-tool/](https://pypi.org/project/network-chaos-tool/)
+
+```bash
+pip install network-chaos-tool
+chaosctl serve
+```
+
+---
+
 ## Web Dashboard Overview
 
 - `chaosctl serve` launches a FastAPI dashboard.

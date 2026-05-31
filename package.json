@@ -19,7 +19,7 @@
 		"@marp-team/marp-cli": "^4.2.3",
 		"chokidar": "^4.0.3",
 		"ejs": "^3.1.10",
-		"live-server": "^1.2.2",
+		"live-server": "^1.2.0",
 		"nodemon": "^3.1.10"
 	},
 	"dependencies": {
