@@ -27,20 +27,20 @@ _class: lead
 
 ---
 
+## Similar Projects
+
+- Chaos Monkey
+- Focused on disrupting production live systems to test resilience.
+- Our scope: Docker dev/test environments and local topologies.
+
+---
+
 ## Project Overview
 
 - Host wrapper `chaosctl` spins up a sidecar.
 - Sidecar enters the target network namespace via `nsenter`.
 - `tc` applies latency, loss, and composite rules.
 - Optional auto-clear and scenario runner.
-
----
-
-## Similar Projects
-
-- Chaos Monkey
-- Focused on disrupting production live systems to test resilience.
-- Our scope: Docker dev/test environments and local topologies.
 
 ---
 
