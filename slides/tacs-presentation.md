@@ -1,6 +1,6 @@
 ---
 marp: true
-title: "Three-Colour Map Colouring with Quantum MDE"
+title: "Three-Colour Map Colouring with Quantum Model-Driven Engineering"
 theme: default
 paginate: true
 style: |
@@ -21,106 +21,84 @@ style: |
   }
 ---
 
-# 🗺️ Three-Colour Map Colouring
-## A Quantum Model-Driven Engineering Demo
+# Three-Colour Map Colouring
 
-**TACS — Group 13 — Problem B**
+A Quantum Model-Driven Engineering Demonstration
 
-Model → Solution → Quantum Circuit → Qiskit → Results
-
----
-
-# 📋 Agenda
-
-| Stage | Topic | Speaker |
-|-------|-------|---------|
-| A | Problem DSL, metamodel & OCL | *(you)* |
-| B | T1: Map → CNF, solution metamodel | *( teammate )* |
-| C | T2: CNF → Quantum circuit, code generation | *( teammate )* |
-| D | Execution, validation & result reporting | *(you)* |
-
-**End-to-end demo:** run the full chain live on one map.
+TACS / Group 13 / Problem B
 
 ---
 
-# 🎯 The Problem in Plain Language
+# Agenda
 
-> Can every region of a map be coloured with **red, green or blue** so that **regions sharing a border get different colours**?
-
-- Only adjacency matters — **no shapes, no distances**.
-- A yes/no decision problem (not optimisation).
-- Three benchmark maps:
-  - **Triangle** — 3 regions, 3 borders, 6 valid colourings
-  - **Ring** — 5 regions, 5 borders, 30 valid colourings
-  - **Wheel** — 6 regions, 10 borders, **not** 3-colourable
-
----
-
-# 🔗 The Full Chain
-
-```text
-PROBLEM DSL INSTANCE          SOLUTION DSL INSTANCE        QUANTUM CIRCUIT
-part1/examples/                part2/t1.py                  part2/t2.py
-triangle_problem.py        →   CNF object model          →   BESSER QuantumCircuit
-Map, Region, Border            Formula, Variable,            (search qubits +
-                                Clause, Literal              workspace ancillas)
-                                      │                            │
-                                      ▼                            ▼
-                            part2/solver_config.py       part2/qiskit_runner.py
-                            Grover rounds, shots,        BESSER QiskitGenerator
-                            backend                       + Jinja template
-                                                                   │
-                                                                   ▼
-                                                        part2/generated/qiskit_circuit.py
-                                                        executed on Aer simulator
-                                                                   │
-                                                                   ▼
-                                                        part2/decoding.py
-                                                        colours + validity report
-```
+1. Problem statement
+2. The full transformation chain
+3. Problem DSL, metamodel and OCL
+4. T1: map to CNF and the solution metamodel
+5. T2: CNF to quantum circuit and code generation
+6. Execution, validation and result reporting
+7. Summary
 
 ---
 
-# 📐 Stage A — Problem DSL
+# Problem Statement
 
-A small language for maps.
+Can every region of a map be coloured with red, green or blue so that regions sharing a border receive different colours?
 
-### Concepts
+Assumptions:
+
+- Only adjacency matters: no shapes, distances or geometry.
+- This is a decision problem, not an optimisation problem.
+- Regions that touch only at a point are not considered neighbours.
+
+Benchmark maps:
+
+| Map | Regions | Borders | Valid colourings |
+|---|---|---|---|
+| Triangle | 3 | 3 | 6 |
+| Ring | 5 | 5 | 30 |
+| Wheel | 6 | 10 | 0 |
+
+---
+
+# Problem DSL: Concepts
+
+The problem language describes maps.
 
 | Class | Attributes | Meaning |
-|-------|-----------|---------|
-| `Map` | `name` | One colouring question |
-| `Region` | `id` | One area to colour |
-| `Border` | *(none)* | Joins two different regions |
+|---|---|---|
+| Map | name | One colouring question |
+| Region | id | One area to colour |
+| Border | none | Joins two different regions |
 
-### Associations
-- `Map` ◆—— `Region` (composition, `1..*`)
-- `Map` ◆—— `Border` (composition, `0..*`)
-- `Border` — `regionA` (`1..1`)
-- `Border` — `regionB` (`1..1`)
+Associations:
 
-**No geometry** — only adjacency is modelled.
+- Map owns Regions by composition (1 to many, at least one).
+- Map owns Borders by composition (0 to many).
+- Border connects regionA and regionB (1 to 1 each).
 
----
-
-# 🛡️ Stage A — OCL Invariants
-
-Six well-formedness rules on the problem metamodel.
-
-| # | Invariant | Context | Why it matters |
-|---|---|---|---|
-| 1 | `NonEmptyMapName` | `Map` | readable name |
-| 2 | `NonEmptyRegionId` | `Region` | ids become variable names |
-| 3 | `UniqueRegionIds` | `Map` | regions distinguishable |
-| 4 | `NoSelfBorder` | `Border` | border joins two different regions |
-| 5 | `EndpointsInSameMap` | `Border` | both ends belong to the owning map |
-| 6 | `NoDuplicateBorders` | `Map` | each unordered pair appears once |
-
-**Note:** colourability is **not** a problem-metamodel rule — it is encoded later in the CNF.
+No geometric attributes are included because only adjacency affects the result.
 
 ---
 
-# 🧱 Stage A — Triangle Object Model
+# Problem DSL: OCL Invariants
+
+Six well-formedness rules constrain the problem metamodel.
+
+| Invariant | Context | Purpose |
+|---|---|---|
+| NonEmptyMapName | Map | Every map has a readable name. |
+| NonEmptyRegionId | Region | Every region has an identifier. |
+| UniqueRegionIds | Map | Region identifiers are unique within a map. |
+| NoSelfBorder | Border | A border joins two different regions. |
+| EndpointsInSameMap | Border | Both endpoints belong to the map that owns the border. |
+| NoDuplicateBorders | Map | Each unordered pair of regions appears at most once. |
+
+The colourability rule is not part of the problem metamodel. It is encoded later in the CNF formula.
+
+---
+
+# Problem DSL: Triangle Instance
 
 ```python
 # part1/examples/triangle_problem.py
@@ -137,74 +115,83 @@ border_ab.regionA = region_a
 border_ab.regionB = region_b
 ```
 
-- `M2` = metamodel (grammar)
-- `M1` = this object model (one sentence)
-- The OCL is parsed against the metamodel at build time.
+This object model conforms to the problem metamodel. The metamodel is the grammar; the object model is one sentence written in that grammar.
 
 ---
 
-# 🔢 Stage B — The Encoding
+# Encoding: Two Bits per Region
 
-Two bits per region, three colours, one pattern forbidden.
+Each region is encoded with two Boolean variables.
 
-| bits `(high, low)` | colour |
+| bits (high, low) | colour |
 |---|---|
-| `00` | red |
-| `01` | green |
-| `10` | blue |
-| `11` | **invalid** |
+| 00 | red |
+| 01 | green |
+| 10 | blue |
+| 11 | invalid |
 
-**Trade-off:** fewer qubits than one-hot encoding, but border clauses are longer.
+This encoding uses fewer search qubits than a one-hot encoding, at the cost of longer border clauses.
 
 ---
 
-# 📝 Stage B — Map → CNF Mapping
+# Mapping: Region to CNF
 
-### Per region `R`
-- 2 variables: `R_high`, `R_low`
-- 1 clause: `(¬R_high ∨ ¬R_low)` → forbids `11`
+For every region R:
 
-### Per border `U—V`
-- 3 clauses, one per colour, each with 4 literals:
+- Two Boolean variables: R_high and R_low.
+- One clause that forbids the invalid pattern 11:
 
 ```text
-both red:    ( U_high  ∨  U_low  ∨  V_high  ∨  V_low )
-both green:  ( U_high  ∨ ¬U_low  ∨  V_high  ∨ ¬V_low )
-both blue:   (¬U_high  ∨  U_low  ∨ ¬V_high  ∨  V_low )
+(not R_high or not R_low)
 ```
 
-**Counting:** `V = 2R`, `C = R + 3B`, `L = 2R + 12B`
+For every border U-V, three clauses forbid equal colours:
+
+```text
+(U_high or U_low or V_high or V_low)         # not both red
+(U_high or not U_low or V_high or not V_low) # not both green
+(not U_high or U_low or not V_high or V_low) # not both blue
+```
 
 ---
 
-# 📊 Stage B — Instance Sizes
+# Mapping: Region to CNF (continuation)
 
-| Map | Regions | Borders | Variables | Clauses | Literals | Valid colourings |
-|---|---|---|---|---|---|---|
-| Triangle | 3 | 3 | 6 | 12 | 42 | 6 |
-| Ring | 5 | 5 | 10 | 20 | 70 | 30 |
-| Wheel | 6 | 10 | 12 | 36 | 132 | **0** |
+Instance sizes:
 
----
-
-# 🧩 Stage B — Solution Metamodel (CNF DSL)
-
-```
-Formula 1──* BooleanVariable (id, regionId, bitRole)
-       1──* Clause (id)
-              1──* Literal (negated)
-                    *──1 BooleanVariable
-```
-
-- `Formula` owns variables and clauses by composition.
-- `Literal` references a variable — **not** composition, because variables are shared.
-- `regionId` and `bitRole` are **traceability** fields; they are not Boolean logic.
-
-Eight OCL invariants ensure well-formed CNF (unique ids, valid bit roles, etc.).
+| Map | Variables | Clauses | Literals | Solutions |
+|---|---|---|---|---|
+| Triangle | 6 | 12 | 42 | 6 |
+| Ring | 10 | 20 | 70 | 30 |
+| Wheel | 12 | 36 | 132 | 0 |
 
 ---
 
-# ⚙️ Stage B — T1 in Code
+# Solution Metamodel
+
+The solution language describes Boolean formulas in conjunctive normal form.
+
+| Class | Attributes | Meaning |
+|---|---|---|
+| Formula | name | One SAT instance, owns variables and clauses |
+| BooleanVariable | id, regionId, bitRole | One colour bit; carries traceability back to the map |
+| Clause | id | One OR constraint; owned by the formula |
+| Literal | negated | One use of a variable, with or without NOT |
+
+---
+
+Associations:
+
+- Formula owns BooleanVariables by composition (1 to many, at least one).
+- Formula owns Clauses by composition (1 to many, at least one).
+- Clause owns Literals by composition (1 to many, at least one).
+- Literal references one BooleanVariable. The variable is not owned because it is shared among clauses.
+
+Traceability fields `regionId` and `bitRole` are not part of the Boolean logic, but they allow measured bitstrings to be decoded back into region colours.
+
+---
+
+# T1: Map to CNF
 
 ```python
 # part2/t1.py
@@ -217,41 +204,21 @@ for border in borders:
     uh, ul = variables[u, "high"], variables[u, "low"]
     vh, vl = variables[v, "high"], variables[v, "low"]
     add_clause([(uh, False), (ul, False), (vh, False), (vl, False)])  # both red
-    add_clause([(uh, False), (ul, True ), (vh, False), (vl, True )])  # both green
-    add_clause([(uh, True ), (ul, False), (vh, True ), (vl, False)])  # both blue
-```
-
-T1 returns a **conforming CNF object model**, checked against the solution metamodel.
-
----
-
-# ⚛️ Stage C — What Grover Does (One Slide)
-
-A quantum search algorithm that **amplifies** the probability of measuring a solution.
-
-1. **Superposition** — put all colour assignments on equal footing.
-2. **Oracle** — marks the assignments that satisfy **every** clause.
-3. **Diffuser** — increases the amplitude of marked states.
-
-Repeat oracle + diffuser `R` times, then measure.
-
-`R` is chosen from `N` (search space) and `M` (number of solutions):
-
-```text
-θ = arcsin(√(M/N))      R ≈ round(π/(4θ) − ½)
+    add_clause([(uh, False), (ul, True),  (vh, False), (vl, True)])   # both green
+    add_clause([(uh, True),  (ul, False), (vh, True),  (vl, False)])  # both blue
 ```
 
 ---
 
-# 🔧 Stage C — T2: CNF → Quantum Circuit Model
+# T2: CNF to Quantum Circuit Model
 
-T2 builds a **BESSER `QuantumCircuit`** object:
+T2 builds a BESSER QuantumCircuit object.
 
-- **Search qubits** = 2 per region (the colour bits)
-- **Workspace ancillas** = scratch qubits for evaluating clauses
-- **No phase ancilla** — the oracle marks by applying `Z` directly to the formula ancilla
+- Search qubits: two per region, holding the colour bits.
+- Workspace ancillas: scratch qubits used to evaluate clauses reversibly.
+- No separate phase ancilla: the oracle marks by applying Z directly to the formula ancilla.
 
-The oracle evaluates the CNF with a **compact AND tree**: ancilla count grows as `O(log C)`.
+The oracle evaluates the CNF using a compact AND tree over the clauses, so the number of workspace qubits scales logarithmically with the number of clauses.
 
 | Map | Search qubits | Workspace qubits | Total qubits |
 |---|---|---|---|
@@ -261,23 +228,24 @@ The oracle evaluates the CNF with a **compact AND tree**: ancilla count grows as
 
 ---
 
-# 🧮 Stage C — From Clauses to Gates
+# From Clauses to Quantum Gates
 
-A clause = OR of literals.
+Each clause is an OR of literals. Using De Morgan's law, T2 turns it into a multi-controlled X gate:
 
-Using De Morgan, T2 turns each clause into a **multi-controlled X gate**:
-- positive literal → control on `0`
-- negated literal → control on `1`
-- target ancilla flips **unless every literal is false**
-- trailing `X` converts that into "clause is true"
+- A positive literal controls on value 0.
+- A negated literal controls on value 1.
+- The target ancilla flips unless every literal is false.
+- A trailing X converts that into "the clause is true".
 
-The clauses are combined by an AND tree of `X` gates over ancillas. After marking, the whole computation is run **backwards** to clear the workspace.
+Clauses are combined by an AND tree of multi-controlled X gates over additional ancillas. After marking the solution states, the entire oracle computation is reversed to clear the workspace.
+
+The diffuser is the standard Grover inversion-about-the-average operator over the search qubits.
 
 ---
 
-# 🖨️ Stage C — Model-to-Text: Qiskit Code
+# Model-to-Text: Qiskit Generation
 
-The circuit model is **not** executed directly.
+The circuit model is not executed directly. BESSER's QiskitGenerator translates it into a runnable Python script.
 
 ```python
 # part2/qiskit_runner.py
@@ -287,22 +255,22 @@ generator = QiskitGenerator(
     backend_type=config.simulator_name,
     shots=config.shots,
 )
-generator.generate()   # → part2/generated/qiskit_circuit.py
+generator.generate()   # -> part2/generated/qiskit_circuit.py
 ```
 
-- Uses **BESSER's QiskitGenerator** and a bundled Jinja template.
-- Generated file is ~3 000 lines; we do not write it by hand.
-- Runs on **Qiskit Aer simulator**.
+A bundled Jinja template is used when the installed BESSER package does not include it. The generated file is roughly three thousand lines and is not written by hand.
 
 ---
 
-# ▶️ Stage D — Running the Pipeline
+# Running the Pipeline
+
+The full chain is invoked with one command:
 
 ```bash
 .venv/bin/python -m part2.pipeline --instance triangle
 ```
 
-Output:
+Example output:
 
 ```text
 === Triangle instance ===
@@ -313,13 +281,13 @@ Circuit: 15 qubits, 12 clauses, R = 2 Grover rounds
 ...
 ```
 
-The pipeline glues T1 → T2 → Qiskit generation → execution → decoding.
+The pipeline executes T1, T2, Qiskit generation, Aer simulation and decoding in sequence.
 
 ---
 
-# 📤 Stage D — Decoding Measurements
+# Decoding Measurements
 
-Qiskit returns bitstrings like `"011010"`.
+Qiskit returns bitstrings such as "011010". The decoder maps each bit to a region and role using the variable traceability fields, then interprets the two-bit colour code.
 
 ```python
 # part2/decoding.py
@@ -329,62 +297,23 @@ for region in regions:
     colours[region] = {"00": "red", "01": "green", "10": "blue", "11": "invalid"}[pair]
 ```
 
-- Bit 0 is **rightmost** in Qiskit strings.
-- Uses **both** models: solution model for bit positions, problem model for regions/borders.
-- Reports invalid regions and conflicting borders.
+Classical bit 0 is the rightmost character in a Qiskit count string. The decoder uses both the problem model (for regions and borders) and the solution model (for bit positions).
 
 ---
 
-# ✅ Stage D — Validation Results
+# Validation Results
 
 ```bash
 .venv/bin/python -m part2.validation
 ```
 
-| Instance | N | M | R | shots | valid | success prob | solutions found |
+| Instance | N | M | R | shots | valid | success probability | solutions found |
 |---|---|---|---|---|---|---|---|
 | triangle | 64 | 6 | 2 | 1024 | 1024 | 100.00% | 6 |
 | ring | 1024 | 30 | 4 | 2048 | 2047 | 99.95% | 30 |
 | wheel | 4096 | 0 | 1 | 1024 | 0 | 0.00% | 0 |
 
-- `N` = search space = `2^(2·regions)`
-- `M` = exact classical solution count
-- `R` = Grover rounds
-- **Wheel unsatisfiability is proven by the classical solver, not by zero counts.**
+N is the search space size, M is the exact classical solution count, and R is the number of Grover rounds.
 
----
+The Wheel result shows zero valid measurements, but unsatisfiability is established by the independent classical solver, not by the quantum measurement alone.
 
-# 🎓 Stage D — Honest Limitations
-
-1. **Classical solution count is known in advance.** Used only to choose `R`.
-2. **Simulation cost grows fast.** Wheel uses 25 qubits and takes minutes.
-3. **No geometry.** Our maps are abstract graphs.
-4. **The generated Qiskit file is large** (~3 000 lines) because it is produced by a generic generator.
-
-These are acceptable for a **model-driven engineering demonstration**; the focus is on transformations, not beating classical solvers.
-
----
-
-# 🧠 Key Takeaways
-
-- Two metamodels (problem + solution) keep concerns separated.
-- T1 and T2 are **model-to-model** transformations; Qiskit generation is **model-to-text**.
-- Traceability fields (`regionId`, `bitRole`) let us decode bitstrings back into domain colours.
-- Solver configuration (`R`, shots, backend) is a **separate model**, not hard-coded.
-- Validation compares quantum output against an independent classical baseline.
-
----
-
-# 🖥️ Live Demo
-
-```bash
-.venv/bin/python -m part2.pipeline --instance triangle
-```
-
-*(Run now, or show pre-recorded output if time is short.)*
-
----
-
-# ❓ Questions?
-
-**Repository:** `project1-g13-tacs-mesw.meic`
