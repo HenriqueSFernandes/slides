@@ -23,3 +23,6 @@ slides:
   - file: grs-project.md
     title: GRS Project Presentation
     slug: grs-project
+  - file: tacs-presentation.md
+    title: TACS Presentation
+    slug: tacs-presentation
